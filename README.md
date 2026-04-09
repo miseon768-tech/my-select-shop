@@ -1,0 +1,56 @@
+# Spring 심화주차 
+- 챕터1-2 : 카카오 사용자 정보 가져오기
+
+## 카카오 소셜 로그인 구현 가이드
+
+카카오 OAuth2 기반의 인가 코드 발급 → 액세스 토큰 교환 → 사용자 정보 조회 → JWT 발급 흐름 정리.
+
+---
+
+## 사전 설정
+
+- **REST API 키** : 카카오 디벨로퍼스 콘솔 > 내 애플리케이션 > 앱 키에서 확인
+- **Client Secret** : 제품 설정 > 카카오 로그인 > 보안 메뉴에서 발급 후 활성 상태 ON 변경 필수 (미설정 시 401 오류 발생)
+- **Redirect URI** : 카카오 디벨로퍼스 콘솔에 콜백 URI 등록 필요
+
+---
+
+## 단계별 구현
+
+### 1단계 — 인가 코드 요청
+- 로그인 버튼 클릭 시 카카오 인증 서버로 이동
+- 쿼리 파라미터로 REST API 키, Redirect URI, 응답 타입(code) 전달
+- 사용자 동의 완료 시 Redirect URI로 인가 코드 전달
+- 로그인 시 **카카오계정(이메일)** 동의 항목 필수 선택
+
+### 2단계 — 인가 코드 수신
+- Controller에서 쿼리 파라미터로 인가 코드 수신
+- Service로 인가 코드 전달 후 로그인 처리
+- 반환된 JWT를 쿠키에 저장 후 메인 페이지로 리다이렉트
+
+### 3단계 — 액세스 토큰 요청
+- 카카오 인증 서버에 POST 요청
+- 요청 파라미터 : grant_type, client_id, redirect_uri, 인가 코드, client_secret
+- 응답 JSON에서 access_token 추출
+
+### 4단계 — 사용자 정보 조회
+- 액세스 토큰을 Authorization 헤더에 담아 카카오 API 서버에 POST 요청
+- 응답 JSON에서 id, nickname, email 추출 후 DTO로 반환
+
+---
+
+## 주요 파일
+
+| 파일 | 역할 |
+|---|---|
+| `UserController` | 인가 코드 수신 및 JWT 쿠키 설정 |
+| `KakaoService` | 액세스 토큰 요청 및 사용자 정보 조회 |
+| `KakaoUserInfoDto` | 카카오 사용자 정보 보관 (id, nickname, email) |
+| `RestTemplateConfig` | RestTemplate 빈 등록 및 타임아웃 설정 |
+| `login.html` | 카카오 로그인 버튼 및 인가 코드 요청 URL 포함 |
+
+---
+
+## 참고
+
+- [카카오 로그인 REST API 공식 문서](https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code)
