@@ -9,6 +9,7 @@ import com.sparta.myselectshop.repository.ProductRepository;
 import com.sparta.myselectshop.repository.UserRepository;
 import com.sparta.myselectshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import java.util.List;
 import static com.sparta.myselectshop.service.ProductService.MIN_MY_PRICE;
 
 @Component
+@ConditionalOnProperty(name = "app.test-data.enabled", havingValue = "true")
 public class TestDataRunner implements ApplicationRunner {
 
     @Autowired
